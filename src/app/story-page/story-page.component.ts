@@ -3,6 +3,7 @@ import { Story } from '../models/story.model';
 import { StoryService } from '../story.service';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { Location } from '@angular/common';
+import { FirebaseListObservable } from 'angularfire2/database';
 
 
 @Component({
@@ -14,19 +15,36 @@ import { Location } from '@angular/common';
 export class StoryPageComponent implements OnInit {
 
   constructor(private route: ActivatedRoute, private location: Location, private router: Router, private storyService: StoryService) { }
-
-  story: Story;
+  stories: FirebaseListObservable<any[]>;
+  story;
   storyId: string;
 
   ngOnInit() {
     this.route.params.forEach((urlParameters) => {
       this.storyId = (urlParameters['id']);
-      this.story = this.storyService.getStoryById(this.storyId);
+      this.stories = this.storyService.getStories();
+      // console.log(this.stories);
+      // this.story = this.filterById(this.storyId);
+      // console.log(this.story);
+      // this.story = this.storyService.getStoryById(this.storyId);
+      // console.log(this.story);
     });
+
+    // console.log(JSON.stringify(this.storyService.getStories()));
   }
 
-  goToStoryPage(clickedStory: Story) {
-    this.router.navigate(['story', clickedStory.id]);
+  // goToStoryPage(clickedStory: Story) {
+  //   this.router.navigate(['story', clickedStory.id]);
+  // }
+
+  filterById(storyId: string) {
+    let length = 0; 
+    this.stories.subscribe( () => length++);
+    for (let i = 0; i <= length - 1; i++) {
+      if (this.stories[i].id === storyId) {
+        return this.stories[i];
+      }
+    }
   }
 
 }
